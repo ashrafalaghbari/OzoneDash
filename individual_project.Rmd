@@ -1,6 +1,6 @@
 ---
 title: "A Storyboard on Ozone Layer"
-Author: "Ashraf Eskandar Ali Al-aghbari (P113003)"
+Author: "Ashraf Alaghbari"
 output: 
   flexdashboard::flex_dashboard:
     storyboard: True
@@ -10,8 +10,9 @@ runtime: shiny
 ---
 
 
+#import libraries
+```{r, include=FALSE}
 
-```{r , include=FALSE }
 library(ggplot2)
 library(tidyverse)
 library(plotly)
@@ -21,6 +22,10 @@ library(ggrepel)
 library(scales)
 library(janitor)
 
+```
+
+```{r, include=FALSE}
+
 ozone_layer<-read.csv("ozone_layer.csv")
 colnames(ozone_layer)[4]<-"emissions"
 b<-read.csv("b.csv")
@@ -28,10 +33,18 @@ colnames(b)[4]<-"emission"
 c<-read.csv("c.csv")
 colnames(c)[4]<-"emission"
 chemical<-read.csv("chemicals.csv")
+Vienna_Convention<-read.csv("Vienna_Convention.csv")
+Ozone_hole_area<-read.csv("Ozone_hole_area.csv")
+change_cfc_concentrations<-read.csv("change_cfc_concentrations.csv")
+stratospheric_ozone_concentration<-read.csv("stratospheric_ozone_concentration.csv")
+stratospheric_chorine_concentrations<-read.csv("stratospheric_chorine_concentrations.csv")
+stratospheric_ozone_concentration_projections<-read.csv("stratospheric_ozone_concentration_projections.csv")
+atmospheric_concentrations_CFC<-read.csv("atmospheric_concentrations_CFC.csv")
+skin_cancer<-read.csv("skin_cancer.csv")
+
 ```
 
 ### <b>Introduction</b>
-
 
 <p style="font-family: times, serif; font-size:15pt; text-align: justify">
     The emission of ozone-depleting gases impacted the earth’s ozone layer – a layer that absorbs most of the Sun’s ultraviolet radiation. Emissions were increasing rapidly until the 1980s. Since then the world has achieved rapid progress: the near-elimination of ozone-depleting substances and the trend towards recovery of the ozone layer are arguably among the most successful international environmental collaborations to date. In this entry I present the data on ozone layer depletion, signs of recovery, emissions of ozone-depleting substances, international agreement and collaboration, and the consequences of ozone layer depletion.
@@ -42,8 +55,7 @@ chemical<-read.csv("chemicals.csv")
 
 
 ```{r, echo=FALSE}
-ozone_layer<-read.csv("ozone_layer.csv")
-colnames(ozone_layer)[4]<-"emissions"
+
 ozone_layer<-ozone_layer%>%pivot_wider(names_from = Entity, values_from = emissions, values_fill = 0)
 colnames(ozone_layer)<-colnames(ozone_layer) %>% make_clean_names()
 f<-list(family="serif", size=22.4, color="#555555")
@@ -57,6 +69,7 @@ colnames(ozone_layer) <- colnames(ozone_layer) %>% make_clean_names()
 
 
 ```{r Fig, echo=FALSE, fig.height=7, fig.width=15}
+
 plot_ly() %>% add_trace(data=ozone_layer,type = 'scatter',
                                                      marker = list(color = "#3C4E66"),
                         mode = 'lines+markers', x=~year, y=~total_emissions,name="Total emissions",
@@ -180,7 +193,7 @@ is the amount of ODS consumed, multiplied by their respective ozone depleting po
 
 ***
 ```{r}
-chemical<-read.csv("chemicals.csv")
+
 v<-chemical[,c(-1,-2)]
 v[is.na(v)] <- 0
 v<-aggregate(v[,-1], by=list(Year=v$Year), FUN=sum)
@@ -221,7 +234,7 @@ designed to address trans-boundary environmental issues.",
 
 ***
 ```{r, include=F}
-Vienna_Convention<-read.csv("Vienna_Convention.csv")
+
 colnames(Vienna_Convention)<-gsub(".", " ", colnames(Vienna_Convention), fixed=TRUE)
 Vienna_Convention<-pivot_longer(Vienna_Convention,4:16 ,names_to = "international agreement",
                 values_to="number of parties")
@@ -240,7 +253,7 @@ selectInput("select_agreement", h3("International agreement"),
 ### <b>Ozone layer depletion: Stratospheric ozone concentration</b>
 
 ```{r, echo=F}
-stratospheric_ozone_concentration<-read.csv("stratospheric_ozone_concentration.csv")
+
 colnames(stratospheric_ozone_concentration)<-colnames(stratospheric_ozone_concentration)%>%
   make_clean_names()
 
@@ -288,7 +301,7 @@ Celsius and a pressure of 1 atmosphere.",
 ### <b>Ozone layer depletion: Ozone hole area</b>
 
 ```{r}
-Ozone_hole_area<-read.csv("Ozone_hole_area.csv")
+
 
 colnames(Ozone_hole_area)<-colnames(Ozone_hole_area)%>%
   make_clean_names()
@@ -331,7 +344,7 @@ resultant from the emission of ozone-depleting substances.",
 ### <b>When is the ozone layer expected to recover?</b>
 
 ```{r}
-stratospheric_chorine_concentrations<-read.csv("stratospheric_chorine_concentrations.csv")
+
 stratospheric_chorine_concentrations<-rename(stratospheric_chorine_concentrations,
           "chorine_concentrations"="Equivalent.stratospheric.chorine..ESC...1960...0.", "year"="Year")
 
@@ -340,6 +353,7 @@ stratospheric_chorine_concentrations<-stratospheric_chorine_concentrations %>%
 ```
 
 ```{r Fig4, echo=FALSE, fig.height=7, fig.width=15}
+
 ggplot(stratospheric_chorine_concentrations,aes(year, chorine_concentrations, color=Entity))+
   scale_x_continuous(breaks = seq(1960, 2100, by = 10))+
   scale_y_continuous(breaks = seq(0, 60, by = 10))+
@@ -365,16 +379,19 @@ levels in 1960 (1960 = 0)",
 <p style="font-family: times, serif; font-size:13pt; text-align: justify">
     -The data presented is measured relative to concentrations in 1960 (where 1960 is equal to 0). ODS can have a significant lifetime in the atmosphere, for some between 50 and 100 years on average. This means that despite reductions in ODS emissions (and eventually complete phase-out of these substances), equivalent stratospheric chlorine (ESC) concentrations are expected to remain higher than 1960 levels through to the end of the century. However, it’s expected that they peaked in the early 2000s and will continue to slowly decline throughout this period
 <p>
+
 ### <b>When is the ozone layer expected to recover?</b>
 
 ```{r}
-stratospheric_ozone_concentration_projections<-read.csv("stratospheric_ozone_concentration_projections.csv")
+
 stratospheric_ozone_concentration_projections<-rename(stratospheric_ozone_concentration_projections,  "ozone_concentration_projections"="Ozone.concentration..1960...0.","year"="Year")
 stratospheric_ozone_concentration_projections<-stratospheric_ozone_concentration_projections %>%
   mutate(label = if_else(year == max(year), as.character(Entity), NA_character_))
+
 ```
 
 ```{r Fig5, echo=FALSE, fig.height=7, fig.width=15}
+
 ggplot(stratospheric_ozone_concentration_projections,aes(year, ozone_concentration_projections, color=Entity))+
   geom_line(aes(alpha=factor(Entity)), size=1)+
   scale_x_continuous(breaks = seq(1960, 2100, by = 10))+
@@ -397,16 +414,18 @@ have notable uncertainty around such average trends.",
   theme(legend.position = "none")+scale_color_manual(values=c("#B13507","#3C4E66","#0073E6"))+
   geom_hline(aes(yintercept = 0), alpha=0.2,size=0.6)+scale_alpha_manual(values=c(0.2,0.2,1))+
   geom_point()
+
 ```
 
 ***
 <p style="font-family: times, serif; font-size:13pt; text-align: justify">
     -In the chart, we see stratospheric ozone concentrations relative to 1960 (1960 = 0). As a global average concentration, it’s expected that ozone levels will return to their 1960 levels around mid-century. Antarctica, where ozone depletion has been most severe due to very low temperatures is expected to recover much more slowly. It’s projected that Antarctic ozone concentrations will only begin to approach 1960 levels by the end of the century.
 <p>
+
 ### <b>How was an increase in emissions detected?</b>
 
 ```{r}
-change_cfc_concentrations<-read.csv("change_cfc_concentrations.csv")
+
 colnames(change_cfc_concentrations)<-colnames(change_cfc_concentrations)%>%
   make_clean_names()
 
@@ -421,9 +440,11 @@ levels(change_cfc_concentrations$stat)<-list("Actual atmospheric CFC-11 concentr
 change_cfc_concentrations<-change_cfc_concentrations %>%
   mutate(label = if_else(year == max(year), as.character(stat), NA_character_))
 change_cfc_concentrations$concentration[is.na(change_cfc_concentrations$concentration)]<-0
+
 ```
 
 ```{r Fig6, echo=FALSE, fig.height=7, fig.width=15}
+
 ggplot(change_cfc_concentrations,aes(year, concentration))+
   geom_line(aes( group = stat,color=stat, linetype = stat),size=1)+
   theme(legend.position = "none")+ 
@@ -443,15 +464,19 @@ sources of CFC-11 emissions.",
   theme(plot.title = element_text(hjust = 0, vjust = 1,color="#555555",
                                   size=22.4,family="serif"))+
   theme(axis.title=element_blank())+scale_color_manual(values=c("#555555","#555555"))+geom_point()
+
 ```
 
 ***
 <p style="font-family: times, serif; font-size:13pt; text-align: justify">
     -In the chart we see the annual change (in percent) of measured concentrations of CFC-11 (shown as the solid line). Also shown is the 2014 projections/expectations of the rate of change in concentration based on reported emissions to the Montreal Protocol (shown as the dashed line). As we see, actual and expected concentration changes map closely over the period up to 2011. Since 2012, however, the annual rate of decline in concentrations has fallen (almost halved from -0.8 percent to -0.4 percent per year). 
 <p>
+
 ### <b>Will recent emissions hinder progress on ozone recovery?</b>
+
 ```{r}
-atmospheric_concentrations_CFC<-read.csv("atmospheric_concentrations_CFC.csv")
+
+
 colnames(atmospheric_concentrations_CFC)<-colnames(atmospheric_concentrations_CFC)%>%
   make_clean_names()
 
@@ -466,9 +491,11 @@ levels(atmospheric_concentrations_CFC$stat)<-list("northern hemisphere"="norther
 atmospheric_concentrations_CFC<-atmospheric_concentrations_CFC %>% filter(year >= 1995 & year <= 2017)
 atmospheric_concentrations_CFC<-atmospheric_concentrations_CFC %>%
   mutate(label = if_else(year == max(year), as.character(stat), NA_character_))
+
 ```
 
 ```{r Fig7, echo=FALSE, fig.height=7, fig.width=15}
+
 ggplot(atmospheric_concentrations_CFC,aes(year, concentration))+
   geom_line(aes( group = stat, color=stat, linetype = stat),size=1)+
   scale_linetype_manual(values=c("solid","solid","dashed"))+
@@ -498,9 +525,11 @@ suggesting unreported sources of CFC-11 emissions.",
 <p style="font-family: times, serif; font-size:13pt; text-align: justify">
     -The long-term impact of emissions for the ozone layer will depend on how long continued emissions of CFC-11 persist.<br><br>-Despite recent emissions, total concentrations continue to fall but at a notably slower rate than expected
 <p>
+
 ### <b>Impacts of ozone depletion on skin cancer risk</b>
+
 ```{r}
-skin_cancer<-read.csv("skin_cancer.csv")
+
 colnames(skin_cancer)<-colnames(skin_cancer)%>%
   make_clean_names()
 
@@ -513,9 +542,11 @@ levels(skin_cancer$stat)<-list("Copenhagen Amendments"="excess_skin_cancer_cases
                                                   "No restrictions"="excess_skin_cancer_cases_per_million_no_restrictions")
 skin_cancer<-skin_cancer %>%
   mutate(label = if_else(year == max(year), as.character(stat), NA_character_))
+
 ```
 
 ```{r Fig8, echo=FALSE, fig.height=7, fig.width=15}
+
 ggplot(skin_cancer,aes(year, excess_skin_cancer_cases, color=stat))+
   geom_line(size=1)+
   theme(legend.position = "none")+ 
@@ -537,6 +568,7 @@ Protocol and Copenhagen Amendment, which tightened regulation.",
                                   size=22.4,family="serif"))+
 theme(axis.title=element_blank())+
   scale_color_manual(values=c("#0073E7","#B13507","grey"))+geom_point()
+
 ```
 
 ***
@@ -572,6 +604,7 @@ This is shown for three scenarios: the assumption of no protocol/restrictions on
 
 
 ### <b>Data sources</b>
+
 <h1 style="font-size:2vw"><b>NASA Ozone Watch</b></h1>
 <b>Data:</b> Concentration of atmospheric ozone and ozone hole area
 <br>
