@@ -25,9 +25,12 @@ This will launch the dashboard and allow you to interact with it.
 Once the dashboard is running, you can explore the data by selecting different countries, years, and variables using the interactive widgets.
 
 # Core R stack
+![hex-shiny](https://user-images.githubusercontent.com/98224412/236501715-82bebe12-52df-4457-8baa-6cbb465e524b.png)(https://shiny.rstudio.com/)
+[![Shiny logo](https://user-images.githubusercontent.com/98224412/236501715-82bebe12-52df-4457-8baa-6cbb465e524b.png)](https://shiny.rstudio.com/)
 
-<!-- [<img target="_blank" src="https://shiny.rstudio.com/images/shiny-logo.png" height="50px">](https://shiny.rstudio.com/)
-[<img target="_blank" src="https://www.tidyverse.org/images/hex-tidyverse.png" height="50px">](https://www.tidyverse.org/)
+
+<!--  [<img target="_blank" src= height="50px">](https://shiny.rstudio.com/) -->
+<!--[<img target="_blank" src="https://www.tidyverse.org/images/hex-tidyverse.png" height="50px">](https://www.tidyverse.org/)
 [<img target="_blank" src="https://rmarkdown.rstudio.com/images/hex-rmarkdown.png" height="50px">](https://rmarkdown.rstudio.com/)
 [<img target="_blank" src="https://dplyr.tidyverse.org/logo.png" height="50px">](https://dplyr.tidyverse.org/)
 [<img target="_blank" src="https://stringr.tidyverse.org/articles/hex-stringr.png" height="50px">](https://stringr.tidyverse.org/)
