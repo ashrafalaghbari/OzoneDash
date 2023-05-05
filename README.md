@@ -39,7 +39,7 @@ Once the dashboard is running, you can explore the data by selecting different c
 
 
 # License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE file](https://github.com/ashrafalaghbari/ozone-dashboard/blob/main/license) for details.
 
 # Data Source and Citation
 
