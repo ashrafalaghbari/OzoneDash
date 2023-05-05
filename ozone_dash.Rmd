@@ -1,0 +1,600 @@
+---
+title: "A Storyboard on Ozone Layer"
+Author: "Ashraf Alaghbari"
+output:
+  flexdashboard::flex_dashboard:
+    storyboard: True
+    theme: journal
+    source_code: embed
+runtime: shiny
+---
+
+
+
+```{r, include=FALSE}
+library(ggplot2)
+library(tidyverse)
+library(data.table)
+library(plotly)
+library(gganimate)
+library(flexdashboard)
+library(ggrepel)
+library(scales)
+library(janitor)
+library(shiny)
+```
+
+### <b>Introduction</b>
+<p style="font-family: times, serif; font-size:15pt; text-align: justify">
+    The emission of gases that deplete the ozone layer, which absorbs most of the Sun's harmful ultraviolet radiation, had a significant impact on the Earth's atmosphere. Until the 1980s, these emissions were increasing rapidly. However, since then, the world has made significant progress in reducing the use of ozone-depleting substances, and the trend towards recovery of the ozone layer is one of the most successful examples of international environmental collaboration to date. In this entry, I will present the latest data on the depletion of the ozone layer, the signs of recovery, the global emissions of ozone-depleting substances, the international agreements and collaborations that have been put in place to address this issue, and the potential consequences of continued ozone depletion.
+</p>
+
+### <b>Emissions of ozone-depleting substances</b>
+```{r, echo=FALSE}
+ozone_depleting_substance_emissions<-read.csv("ozone_depleting_substance_emissions.csv")
+colnames(ozone_depleting_substance_emissions)[4]<-"emissions"
+
+ozone_depleting_substance_emissions<-ozone_depleting_substance_emissions%>%
+  pivot_wider(names_from = Entity, values_from = emissions, values_fill = 0)
+
+colnames(ozone_depleting_substance_emissions)<-colnames(ozone_depleting_substance_emissions) %>%
+  make_clean_names()
+
+f<-list(family="serif", size=22.4, color="#555555")
+label =list(bgcolor ="white",
+            bordercolor="green",
+            font=f)
+
+colnames(ozone_depleting_substance_emissions) <- colnames(ozone_depleting_substance_emissions) %>% 
+  make_clean_names()
+```
+
+
+
+```{r Fig, echo=FALSE, fig.height=7, fig.width=15}
+
+plot_ly() %>% add_trace(data=ozone_depleting_substance_emissions,type = 'scatter',
+                                                     marker = list(color = "#3C4E66"),
+                        mode = 'lines+markers', x=~year, y=~total_emissions,name="Total emissions",
+
+ hovertemplate =paste("<b>%{x}</b><br>",
+                      "Total emissions : %{y}",
+                      "<extra></extra>")) %>%
+  add_trace(data=ozone_depleting_substance_emissions,type = 'scatter',
+            mode = 'lines+markers', x=~year, y=~natural_emissions,name="Natural emissions",
+            marker = list(color = "#B13507"),
+            hovertemplate =paste("<b>%{x}</b>",
+                                 "<br> Natural emissions: %{y}" ,
+                                 "<extra></extra>"))  %>%
+  layout(title=list(text = "<b>Ozone-depleting substance emissions in million tonnes, 1961 to 2014</b>",
+                    font = f,
+                    y = 1, x=0.1, hovermode = "y unified"),
+         yaxis= list(title ="",range = list(0, 1500000)),
+         xaxis= list(title =""), annotations =
+           list(x = 1, y = -0.07, text = "Source: Hegglin et al. (2014).",
+                showarrow = F, xref='paper', yref='paper',
+                xanchor='right', yanchor='auto', xshift=0, yshift=0,
+                font=list(size=12, color="black"))) %>%
+    style(hoverlabel= label)
+```
+
+---
+
+<p style="font-family: times, serif; font-size:13pt; text-align: justify">
+    -The chart displays the level of natural emissions, which have remained consistent over time, and the total emissions, which include both natural and man-made emissions. It shows a clear trend of growth, peak, and reduction in ozone-depleting emissions. From 1960 to the late 1980s, emissions rapidly increased by more than three-fold, followed by an equally fast reduction. By 2010, emissions had returned to their 1960 levels.
+</p>
+
+
+### <b>Consumption of ozone-depleting substances</b>
+```{r Fig1, echo=FALSE, fig.height=7, fig.width=15}
+ozone_depleting_substances_index<-read.csv("ozone_depleting_substances_index.csv")
+colnames(ozone_depleting_substances_index)[4]<-"index"
+
+ggplot(ozone_depleting_substances_index, aes(Year, index))+
+  geom_line(size=1, color="#3C4E66")+
+  scale_y_continuous(breaks = seq(0, 150, by = 10),labels = unit_format(unit = "%"))+
+  scale_x_continuous(breaks = seq(1986, 2018, by = 4))+
+  theme(axis.text.x=element_text(face="bold",size=12))+
+  theme(axis.text.y=element_text(face="bold",size=12))+
+  geom_point()+
+  labs(title = "Change in the consumption of ozone-depleting substances, world",
+    subtitle = "Global consumption of ozone-depleting substances (ODS),
+measured relative to the year 1986 (where consumption in 1986 is equal to 100).",
+       caption = "Source: European Environment Agency (EEA)")+
+  theme(plot.title = element_text(hjust = 0, vjust = 1,color="#555555",
+                                  size=22.4,family="serif"))+theme(axis.title=element_blank())
+
+
+```
+
+***
+<p style="font-family: times, serif; font-size:13pt; text-align: justify">
+    -The chart displays the global decline in consumption of ozone-depleting substances (ODS) since 1986. The data is measured by indexing the ODS consumption levels in 1986 to 100, and we can see a significant decline in the consumption levels over time. After a 28% rise in 1987, there was a rapid increase in global ODS consumption. However, by 1995, consumption had already fallen by over 60%, and by 2000, it had fallen by 80%. The chart shows that by 2018, ODS consumption levels had fallen by 99.7% globally.
+<p>
+
+### <b>Consumption of ozone-depleting substances by country</b>
+```{r}
+renderPlot({
+  consumption_of_ozone_depleting_substances<-c[,c("Year",as.character(input$select))]
+  names(consumption_of_ozone_depleting_substances)<-c("year","country")
+  ggplot(consumption_of_ozone_depleting_substances,aes(year, country))+ geom_line()+
+  scale_x_continuous(breaks = seq(1986, 2018, by = 2))+
+  scale_y_continuous(label=label_number(suffix = " tonnes"))+
+  theme(axis.text.x=element_text(color="#333333",size=14.4))+
+  theme(axis.text.y=element_text(color="#333333",size=14.4))+
+  geom_line(size=1)+
+  labs(title = "Consumption of Ozone-Depleting Substances, 1989 to 2014",
+       subtitle = "Consumption of all ozone-depleting substances (ODS). ODS consumption is
+measured units of ODS tonnes, which is the amount of ODS consumed, multiplied by their respective
+ozone depleting potential value. Data for individual parties to the European Union (EU) are not
+shown since party obligations are collective",
+       caption = "Source: European Environment Agency (EEA)")+
+  theme(plot.title = element_text(hjust = 0, vjust = 1,color="#555555",
+                                  size=22.4,family="serif"))+
+  theme(axis.title=element_blank())+
+  guides(color=F, size=F, fill=F)
+
+})
+```
+
+***
+```{r}
+consumption_of_ozone_depleting_substances<-read.csv("consumption_of_ozone_depleting_substances.csv")
+colnames(consumption_of_ozone_depleting_substances)[4]<-"consumption"
+
+consumption_of_ozone_depleting_substances<-pivot_wider(consumption_of_ozone_depleting_substances[,-2],
+          names_from = Entity, values_from = consumption, values_fill = 0) %>%
+                                                                arrange(Year)
+list<-as.list(colnames(consumption_of_ozone_depleting_substances))[-1]
+
+selectInput("select", h3("Country"),
+            choices=list, selected=list[205])
+```
+<p style="font-family: times, serif; font-size:13pt; text-align: justify">
+    -The chart displays the quantity of ozone-depleting substances (ODS) consumed by country, measured in tonnes and weighted relative to their depleting potential. This weighting accounts for the different degrees to which each ODS depletes the ozone layer. By looking at this data, we can identify the countries with the highest ODS consumption and the trends over time.
+<p>
+
+### <b>Consumption of ozone-depleting substances by substance</b>
+```{r}
+renderPlot({
+  chemicals<-chemicals[,c("Year",as.character(input$radio))]
+  names(chemicals)<-c("year","depleted_substance")
+
+ggplot(chemicals, aes(year, depleted_substance))+ geom_area(aes(fill="navy"))+
+  scale_x_continuous(breaks = seq(1989, 2014, by = 2))+
+  scale_y_continuous(labels = unit_format(unit = "M tonnes", scale = 1e-6))+
+  theme(axis.text.x=element_text(color="#333333",size=14.4))+
+  theme(axis.text.y=element_text(color="#333333",size=14.4))+
+  geom_line(size=1)+
+  labs(title = "Ozone-depleting substance consumption, World",
+       subtitle = "Annual consumption of ozone-depleting substances (ODS). ODS consumption is measured units of ODS tonnes, which
+is the amount of ODS consumed, multiplied by their respective ozone depleting potential value.",
+       caption = "Source: UN Environment Programme")+
+  theme(plot.title = element_text(hjust = 0, vjust = 1,color="#555555",
+                                  size=22.4,family="serif"))+
+  theme(axis.title=element_blank())+
+  guides(color=F, size=F, fill=F)
+
+})
+```
+
+
+***
+```{r}
+chemicals<-read.csv("chemicals.csv")
+chemicals<-chemicals[,c(-1,-2)]
+chemicals[is.na(chemicals)] <- 0
+chemicals<-aggregate(chemicals[,-1], by=list(Year=chemicals$Year), FUN=sum)
+chemicals<-chemicals %>% rename("Methyl Bromide"="Methyl.Bromide",
+             "Carbon Tetrachloride"="Carbon.Tetrachloride",
+             "Hydrochlorofluorocarbons HCFCs"="Hydrochlorofluorocarbons..HCFCs.",
+             "Chlorofluorocarbons CFCs"="Chlorofluorocarbons..CFCs.",
+             "Methyl Chloroform"="Methyl.Chloroform")
+list<-as.list(colnames(chemicals))[-1]
+radioButtons("radio", h3("Ozone-depleting substance"),
+            choices=list, selected=list[1])
+
+```
+<p style="font-family: times, serif; font-size:13pt; text-align: justify">
+     -The chart shows the declining trend in global consumption of ozone-depleting substances (ODS) since 1989. It's interesting to note the changes in the quantity of individual substances as well. In the 1990s and early 2000s, chlorofluorocarbons (CFCs) were the dominant ODS, accounting for 60% of global consumption, which reduced to 50%. However, since the 2000s, there has been a shift towards hydrochlorofluorocarbons (HCFCs), which accounted for 94% of global consumption in 2014. This transition reflects the substitution of CFCs with HCFCs to reduce total ozone depletion. The use of CFCs has been significantly reduced, declining from over 2.7 million tonnes in 1989 to 156 tonnes in 2014.
+<p>
+
+
+### <b>International agreements for the Protection of the Ozone Layer</b>
+```{r}
+renderPlot({
+  agreement<-Vienna_Convention[Vienna_Convention$international_agreement==input$select_agreement,
+                               c("year","international_agreement","number_of_parties")]
+ggplot(agreement,aes(year, number_of_parties))+ geom_line(size=1)+
+  scale_x_continuous(breaks = seq(1971, 2015, by = 4))+
+  theme(axis.text.x=element_text(color="#333333",size=14.4))+
+  theme(axis.text.y=element_text(color="#333333",size=14.4))+
+  labs(title = "Number of parties in multilateral environmental agreements",
+       subtitle = "Total number of global parties signed on to multilateral agreements
+designed to address trans-boundary environmental issues.",
+       caption = "Source: United Nations Conference on Trade and Development (UNCTAD)")+
+  theme(plot.title = element_text(hjust = 0, vjust = 1,color="#555555",
+                                  size=22.4,family="serif"))+
+  theme(axis.title=element_blank())+
+  guides(color=F, size=F, fill=F)
+})
+
+```
+
+***
+```{r, include=F}
+Vienna_Convention<-read.csv("Vienna_Convention.csv")
+colnames(Vienna_Convention)<-gsub(".", " ", colnames(Vienna_Convention), fixed=TRUE)
+Vienna_Convention<-pivot_longer(Vienna_Convention,4:16 ,names_to = "international agreement",
+                values_to="number of parties")
+library(janitor)
+colnames(Vienna_Convention)<-colnames(Vienna_Convention) %>% make_clean_names()
+```
+
+```{r}
+list_agreements<-as.list(unique(Vienna_Convention$international_agreement))
+selectInput("select_agreement", h3("International agreement"),
+            choices=list_agreements, selected=list_agreements[1])
+```
+<p style="font-family: times, serif; font-size:13pt; text-align: justify">
+    -The sharp reduction in emissions of ozone-depleting substances depicted on the left chart was achieved through international efforts to phase out their production. This effort began in 1985 with the adoption of the Vienna Convention for the Protection of the Ozone Layer, which came into force in 1988.<br><br>The right chart shows the global participation in the Vienna Convention over time. In its first year, only 29 parties had signed the agreement, but this number rapidly increased in the following years, reaching 174 parties by 2000.
+<p>
+### <b>Ozone layer depletion: Stratospheric ozone concentration</b>
+
+```{r, echo=F}
+stratospheric_ozone_concentration<-read.csv("stratospheric_ozone_concentration.csv")
+
+colnames(stratospheric_ozone_concentration)<-colnames(stratospheric_ozone_concentration)%>%
+  make_clean_names()
+
+stratospheric_ozone_concentration<-pivot_longer(stratospheric_ozone_concentration,4:5 ,names_to = "stat",
+                                values_to="concentration")
+stratospheric_ozone_concentration$stat<-as.factor(stratospheric_ozone_concentration$stat)
+levels(stratospheric_ozone_concentration$stat)<-list("mean daily concentration"="mean_daily_concentration_nasa",
+                                                     "minimum daily concentration"="minimum_daily_concentration_nasa")
+```
+
+
+```{r, echo=F}
+stratospheric_ozone_concentration<-stratospheric_ozone_concentration %>%
+  mutate(label = if_else(year == max(year), as.character(stat), NA_character_))
+```
+
+
+
+```{r Fig2, echo=FALSE, fig.height=7, fig.width=15}
+
+ggplot(stratospheric_ozone_concentration,aes(year, concentration, color=stat))+
+  scale_y_continuous(label=label_number(suffix = " DU"))+
+  scale_x_continuous(breaks = seq(1979, 2020, by = 4))+
+  theme(axis.text.x=element_text(color="#333333",size=14.4))+
+  theme(axis.text.y=element_text(color="#333333",size=14.4))+
+  geom_line(size=1)+
+  geom_label_repel(aes(label = label),
+                   nudge_x = 1,
+                   na.rm = TRUE,direction = c("y"))+
+  labs(title = "Stratospheric ozone concentration",
+    subtitle = "Stratospheric ozone concentration in the Southern Hemisphere,measured in
+Dobson Units   (DU). One Dobson Unit is the number of molecules of ozone that would be required to create a layer of pure ozone 0.01 millimeters thick at a temperature of 0 degrees
+Celsius and a pressure of 1 atmosphere.",
+       caption = "Source: NASA Ozone Watch")+
+  theme(plot.title = element_text(hjust = 0, vjust = 1,color="#555555",
+                                  size=22.4,family="serif"))+theme(axis.title=element_blank())+
+  guides(color=F, size=F)+scale_color_manual(values=c("#B13507","#3C4E66"))
+
+
+```
+
+***
+<p style="font-family: times, serif; font-size:13pt; text-align: justify">
+    -What is the impact of man-made emissions of ozone-depleting substances on stratospheric ozone concentrations?<br><br>-The chart displays the average concentration of stratospheric ozone in the Southern Hemisphere, where ozone depletion has been most severe, from 1979 to 2020.<br><br>-We can observe a downward trend in ozone concentrations from 1979 to the early 1990s, when they reached the critical level of 100 DU known as the 'ozone hole.' Since then, concentrations have remained around or below that level, with a slow recovery beginning in the last decade (since 2010).
+<p>
+
+### <b>Ozone layer depletion: Ozone hole area</b>
+
+```{r}
+
+Ozone_hole_area<-read.csv("Ozone_hole_area.csv")
+
+colnames(Ozone_hole_area)<-colnames(Ozone_hole_area)%>%
+  make_clean_names()
+
+Ozone_hole_area<-pivot_longer(Ozone_hole_area,4:5 ,names_to = "stat",
+                                                values_to="area")
+Ozone_hole_area$stat<-as.factor(Ozone_hole_area$stat)
+levels(Ozone_hole_area$stat)<-list("maximum ozone hole area nasa"="maximum_ozone_hole_area_nasa",
+                                                     "mean ozone hole area"="mean_ozone_hole_area")
+Ozone_hole_area<-Ozone_hole_area %>%
+  mutate(label = if_else(year == max(year), as.character(stat), NA_character_))
+```
+
+```{r Fig3, echo=FALSE, fig.height=7, fig.width=15}
+
+ggplot(Ozone_hole_area,aes(year, area, color=stat))+
+  scale_y_continuous(labels = unit_format(unit = "M km²", scale = 1e-6))+
+  scale_x_continuous(breaks = seq(1979, 2020, by = 4))+
+  theme(axis.text.x=element_text(color="#333333",size=14.4))+
+  theme(axis.text.y=element_text(color="#333333",size=14.4))+
+  geom_line(size=1)+
+  geom_label_repel(aes(label = label),
+                   nudge_x = 1,
+                   na.rm = TRUE,direction = c("y"))+
+  labs(title = "Antarctic ozone hole area",
+       subtitle = "Annual maximum and mean Antarctic stratospheric ozone hole area,
+resultant from the emission of ozone-depleting substances.",
+       caption = "Source: NASA Ozone Watch")+
+  theme(plot.title = element_text(hjust = 0, vjust = 1,color="#555555",
+                                  size=22.4,family="serif"))+theme(axis.title=element_blank())+
+  guides(color=F, size=F)+scale_color_manual(values=c("#B13507","#3C4E66"))
+
+```
+
+***
+<p style="font-family: times, serif; font-size:13pt; text-align: justify">
+    -We can observe a significant increase in the Antarctic ozone hole area since 1979, reaching a peak of 30 million km2 in the early 2000s. However, from the late 1990s, the ozone hole area has approximately stabilized, fluctuating between 20 to 25 million km2.
+<p>
+
+### <b>When is the ozone layer expected to recover?</b>
+
+```{r}
+stratospheric_chorine_concentrations<-read.csv("stratospheric_chorine_concentrations.csv")
+
+stratospheric_chorine_concentrations<-rename(stratospheric_chorine_concentrations,
+          "chorine_concentrations"="Equivalent.stratospheric.chorine..ESC...1960...0.", "year"="Year")
+
+stratospheric_chorine_concentrations<-stratospheric_chorine_concentrations %>%
+  mutate(label = if_else(year == max(year), as.character(Entity), NA_character_))
+```
+
+```{r Fig4, echo=FALSE, fig.height=7, fig.width=15}
+
+ggplot(stratospheric_chorine_concentrations,aes(year, chorine_concentrations, color=Entity))+
+  scale_x_continuous(breaks = seq(1960, 2100, by = 10))+
+  scale_y_continuous(breaks = seq(0, 60, by = 10))+
+  theme(axis.text.x=element_text(color="#333333",size=14.4))+
+  theme(axis.text.y=element_text(color="#333333",size=14.4))+
+  geom_line(size=1)+
+  geom_label_repel(aes(label = label),
+                   nudge_x = 1,
+                   na.rm = TRUE,direction = c("y"))+
+  labs(title = "Stratospheric chlorine concentrations, 1960 to 2100",
+       subtitle = "Equivalent stratospheric chloric (ESC) concentrations with projections to 2100
+based on chemistry-climate models. ESC concentrations are measured relative to
+levels in 1960 (1960 = 0)",
+       caption = "Source: Hegglin et al. (2014).")+
+  theme(plot.title = element_text(hjust = 0, vjust = 1,color="#555555",
+                                  size=22.4,family="serif"))+
+  theme(axis.title=element_blank())+
+  guides(color=F, size=F)+scale_color_manual(values=c("#B13507","#3C4E66","#0073E6"))
+
+```
+
+***
+<p style="font-family: times, serif; font-size:13pt; text-align: justify">
+    -The data presented here is measured relative to the concentrations in 1960, where the concentration of ozone-depleting substances (ODS) in that year is considered to be 0. ODS can persist in the atmosphere for a significant amount of time, ranging from 50 to 100 years on average. Therefore, despite reductions in ODS emissions and the eventual phase-out of these substances, the equivalent stratospheric chlorine (ESC) concentrations are expected to remain higher than 1960 levels until the end of the century. However, it's anticipated that ESC concentrations peaked in the early 2000s and will gradually decline over this period.
+<p>
+
+### <b>When is the ozone layer expected to recover?</b>
+
+```{r}
+stratospheric_ozone_concentration_projections<-read.csv("stratospheric_ozone_concentration_projections.csv")
+
+stratospheric_ozone_concentration_projections<-rename(stratospheric_ozone_concentration_projections,  "ozone_concentration_projections"="Ozone.concentration..1960...0.","year"="Year")
+stratospheric_ozone_concentration_projections<-stratospheric_ozone_concentration_projections %>%
+  mutate(label = if_else(year == max(year), as.character(Entity), NA_character_))
+
+```
+
+```{r Fig5, echo=FALSE, fig.height=7, fig.width=15}
+
+ggplot(stratospheric_ozone_concentration_projections,
+       aes(year, ozone_concentration_projections, color=Entity))+
+  geom_line(aes(alpha=factor(Entity)), size=1)+
+  scale_x_continuous(breaks = seq(1960, 2100, by = 10))+
+  scale_y_continuous(breaks = seq(-140, 40, by = 20))+
+  theme(axis.text.x=element_text(color="#333333",size=14.4))+
+  theme(axis.text.y=element_text(color="#333333",size=14.4))+
+  geom_label_repel(aes(label = label),
+                   nudge_x = 1,
+                   na.rm = TRUE,direction = c("y"))+
+  labs(title = "Stratospheric ozone concentration projections, 1960 to 2100",
+       subtitle = "Stratospheric ozone concentrations with projections to 2100 based on
+chemistry-climate models. Ozone concentrations are measured relative
+to levels in 1960 (1960 = 0), and measured as the global average,and regional
+average. Figures represent the mean across a number of model runs; model projections
+have notable uncertainty around such average trends.",
+       caption = "Source: Hegglin et al. (2014).")+
+  theme(plot.title = element_text(hjust = 0, vjust = 1,color="#555555",
+                                  size=22.4,family="serif"))+
+  theme(axis.title=element_blank())+
+  theme(legend.position = "none")+scale_color_manual(values=c("#B13507","#3C4E66","#0073E6"))+
+  geom_hline(aes(yintercept = 0), alpha=0.2,size=0.6)+scale_alpha_manual(values=c(0.2,0.2,1))+
+  geom_point()
+
+```
+
+***
+<p style="font-family: times, serif; font-size:13pt; text-align: justify">
+    -In the chart, we can observe the stratospheric ozone concentrations as relative to the year 1960 (where 1960 is set as 0). As a global average concentration, it's projected that ozone levels will return to their 1960 levels around mid-century. However, the recovery process will be slower in Antarctica, where ozone depletion has been most severe due to extremely low temperatures. The projection suggests that Antarctic ozone concentrations will begin to approach 1960 levels only by the end of the century.
+<p>
+
+### <b>How was an increase in emissions detected?</b>
+
+```{r}
+change_cfc_concentrations<-read.csv("change_cfc_concentrations.csv")
+
+colnames(change_cfc_concentrations)<-colnames(change_cfc_concentrations)%>%
+  make_clean_names()
+
+change_cfc_concentrations<-pivot_longer(change_cfc_concentrations,4:5 ,names_to = "stat",
+                              values_to="concentration")
+
+change_cfc_concentrations$stat<-as.factor(change_cfc_concentrations$stat)
+levels(change_cfc_concentrations$stat)<-list("Actual atmospheric CFC-11 concentrations"="cfc_11_measurement",
+                                   "Expected/projected atmospheric CFC-11 concentrations"="wmo_2014")
+
+
+change_cfc_concentrations<-change_cfc_concentrations %>%
+  mutate(label = if_else(year == max(year), as.character(stat), NA_character_))
+change_cfc_concentrations$concentration[is.na(change_cfc_concentrations$concentration)]<-0
+
+```
+
+```{r Fig6, echo=FALSE, fig.height=7, fig.width=15}
+
+ggplot(change_cfc_concentrations,aes(year, concentration))+
+  geom_line(aes( group = stat,color=stat, linetype = stat),size=1)+
+  theme(legend.position = "none")+
+  scale_x_continuous(breaks = seq(1995, 2018, by = 1))+
+  scale_y_continuous(breaks = seq(-1.2, 0, by = 0.2),label=label_number(suffix = "%"))+
+  theme(axis.text.x=element_text(color="#333333",size=14.4))+
+  theme(axis.text.y=element_text(color="#333333",size=14.4))+
+  geom_label_repel(aes(label = label),
+                   nudge_x = 1,
+                   na.rm = TRUE,direction = c("y"))+
+  labs(title = "Annual change in atmospheric CFC-11 concentrations",
+       subtitle = "Annual change in atmospheric trichlorofluoromethane (CFC-11) concentrations, given as actual measured concentration
+change (solid line), and expected/projected rate of change based on reported emissions of parties to the Montreal
+Protocol (dashed line). Since 2012, concentrations have fallen at a lower rate than expected, suggesting unreported
+sources of CFC-11 emissions.",
+       caption = "Source: Montzka et al. (2018)")+
+  theme(plot.title = element_text(hjust = 0, vjust = 1,color="#555555",
+                                  size=22.4,family="serif"))+
+  theme(axis.title=element_blank())+scale_color_manual(values=c("#555555","#555555"))+geom_point()
+
+```
+
+***
+<p style="font-family: times, serif; font-size:13pt; text-align: justify">
+    -The chart displays the percentage change in annual measurements of CFC-11 concentration (solid line) and the expected rate of change based on reported emissions to the Montreal Protocol in 2014 (dashed line). From the graph, we can see that the actual and projected concentration changes aligned closely until 2011. However, starting in 2012, the annual rate of concentration decline has slowed down, dropping from -0.8 percent to -0.4 percent per year.
+<p>
+
+### <b>Will recent emissions hinder progress on ozone recovery?</b>
+
+```{r}
+
+atmospheric_concentrations_CFC<-read.csv("atmospheric_concentrations_CFC.csv")
+
+colnames(atmospheric_concentrations_CFC)<-colnames(atmospheric_concentrations_CFC)%>%
+  make_clean_names()
+
+atmospheric_concentrations_CFC<-pivot_longer(atmospheric_concentrations_CFC,4:6 ,names_to = "stat",
+                                        values_to="concentration")
+
+atmospheric_concentrations_CFC$stat<-as.factor(atmospheric_concentrations_CFC$stat)
+levels(atmospheric_concentrations_CFC$stat)<-list("northern hemisphere"="northern_hemisphere",
+                                             "southern hemisphere"="southern_hemisphere",
+                                             "WMO 2014 projected"="wmo_2014")
+
+atmospheric_concentrations_CFC<-atmospheric_concentrations_CFC %>% filter(year >= 1995 & year <= 2017)
+atmospheric_concentrations_CFC<-atmospheric_concentrations_CFC %>%
+  mutate(label = if_else(year == max(year), as.character(stat), NA_character_))
+
+```
+
+```{r Fig7, echo=FALSE, fig.height=7, fig.width=15}
+
+ggplot(atmospheric_concentrations_CFC,aes(year, concentration))+
+  geom_line(aes( group = stat, color=stat, linetype = stat),size=1)+
+  scale_linetype_manual(values=c("solid","solid","dashed"))+
+  theme(legend.position = "none")+
+  scale_x_continuous(breaks = seq(1995, 2018, by = 1))+
+  scale_y_continuous(breaks = seq(200, 260, by = 10),label=label_number(suffix = " ppt"))+
+  theme(axis.text.x=element_text(color="#333333",size=14.4))+
+  theme(axis.text.y=element_text(color="#333333",size=14.4))+
+  geom_label_repel(aes(label = label),
+                   nudge_x = 1,
+                   na.rm = TRUE,direction = c("both"))+
+  labs(title = "Measured and expected atmospheric concentrations of CFC-11",
+       subtitle = "Measured concentrations of trichlorofluoromethane (CFC-11) gas in
+the Northern and Southern hemispheres, measured relative to the expected/projected
+concentrations based on emissions reported by countries to the Montreal Protocol.
+This is measured in mole fractions (ppt) of CFC-11. In recent years (since 2012),
+concentrations have not declined at the projected rate,
+suggesting unreported sources of CFC-11 emissions.",
+       caption = "Source: Montzka et al. (2018)")+
+  theme(plot.title = element_text(hjust = 0, vjust = 1,color="#555555",
+                                  size=22.4,family="serif"))+
+  theme(axis.title=element_blank())+scale_color_manual(values=c("#0073E7","#B13507","grey"))+geom_point()
+
+```
+
+***
+<p style="font-family: times, serif; font-size:13pt; text-align: justify">
+    -The long-term impact of CFC-11 emissions on the ozone layer will depend on how long these emissions persist. Although total concentrations of CFC-11 continue to decline, the rate of decline is slower than expected, possibly due to recent emissions. Therefore, it remains to be seen how much longer these emissions will continue to affect the ozone layer and its recovery.
+<p>
+
+### <b>Impacts of ozone depletion on skin cancer risk</b>
+
+```{r}
+skin_cancer<-read.csv("skin_cancer.csv")
+
+colnames(skin_cancer)<-colnames(skin_cancer)%>%
+  make_clean_names()
+
+skin_cancer<-pivot_longer(skin_cancer,4:6 ,names_to = "stat",
+                                             values_to="excess_skin_cancer_cases")
+skin_cancer<-skin_cancer %>% filter(entity=="United States")
+skin_cancer$stat<-as.factor(skin_cancer$stat)
+levels(skin_cancer$stat)<-list("Copenhagen Amendments"="excess_skin_cancer_cases_per_million_copenhagen_amendments",
+                                                  "Montreal Protocol"="excess_skin_cancer_cases_per_million_montreal_protocol",
+                                                  "No restrictions"="excess_skin_cancer_cases_per_million_no_restrictions")
+skin_cancer<-skin_cancer %>%
+  mutate(label = if_else(year == max(year), as.character(stat), NA_character_))
+
+```
+
+```{r Fig8, echo=FALSE, fig.height=7, fig.width=15}
+
+ggplot(skin_cancer,aes(year, excess_skin_cancer_cases, color=stat))+
+  geom_line(size=1)+
+  theme(legend.position = "none")+
+  scale_x_continuous(breaks = seq(2000, 2100, by = 20))+
+  scale_y_continuous(breaks = seq(0, 6000, by = 1000))+
+  theme(axis.text.x=element_text(color="#333333",size=14.4))+
+  theme(axis.text.y=element_text(color="#333333",size=14.4))+
+  geom_label_repel(aes(label = label),
+                   nudge_x = 1,
+                   na.rm = TRUE,direction = c("y"))+
+  labs(title = "Excess skin cancer cases due to ozone depletion, United States, 2000 to 2100",
+       subtitle = "Historic estimates of the number of excess skin cancer cases,
+measured per million people, resultant from stratospheric ozone depletion
+(which increases exposure to UV radiation). Estimated under scenario
+of no restrictions on ozone-depleting substances, the initial Montreal
+Protocol and Copenhagen Amendment, which tightened regulation.",
+       caption = "Source: Slaper et al. (1996)")+
+  theme(plot.title = element_text(hjust = 0, vjust = 1,color="#555555",
+                                  size=22.4,family="serif"))+
+theme(axis.title=element_blank())+
+  scale_color_manual(values=c("#0073E7","#B13507","grey"))+geom_point()
+
+```
+
+***
+<p style="font-family: times, serif; font-size:13pt; text-align: justify">
+    -The study estimates that the reduction of ODS from the Montreal Protocol and its later revisions will result in two million avoided cases worldwide per year by 2030. This is shown for three scenarios: first, the assumption that there are no restrictions on ODS consumption; second, the initial Montreal Protocol treaty; and third, the later Copenhagen Amendment, which increased the ambition for ODS reduction.
+<p>
+
+### <b>Conclusion</b>
+<p style="font-family: times, serif; font-size:15pt; text-align: justify">
+    -Global emissions of ozone-depleting substances (ODS) have decreased by more than 99% since 1986, which was the year before the Montreal Protocol (and later amendments) was adopted in 1987. The agreement has been signed by all countries, leading to a significant reduction in ODS emissions worldwide.
+<p>
+
+<p style="font-family: times, serif; font-size:15pt; text-align: justify">
+    -From the 1980s to the early 2000s, the ozone layer thickness declined and the Antarctic ozone hole grew substantially. However, this trend largely stabilized during the first decade of the 21st century, and we are now seeing initial signs of recovery. Nevertheless, it will take decades for the ozone layer to fully recover.
+<p>
+
+<p style="font-family: times, serif; font-size:15pt; text-align: justify">
+    -Ozone layer depletion allows more ultraviolet (UV) irradiation to reach Earth's surface, which can increase the risk of skin cancer, particularly at higher latitudes.
+<p>
+
+<p style="font-family: times, serif; font-size:15pt; text-align: justify">
+    -The global transition away from ODS has had co-benefits for reducing greenhouse gas emissions.
+<p>
+
+
+
+
+
+
+
