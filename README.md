@@ -1,6 +1,9 @@
 # Ozone Layer Dashboard
 This dashboard provides an overview of key insights on the Ozone Layer, including emissions of substances that deplete the ozone layer, the success of the Montreal Protocol, and the stabilization of ozone levels in the stratosphere since the late 1990s. It also includes information on the rapid growth of the ozone hole over the Antarctic until it stopped growing around the year 2000. The data used in this dashboard was obtained from Our World in Data's Ozone Layer topic page, with data published by various organizations including the World Meteorological Organization, UNEP, NOAA, NASA, and the European Commission
 
+# Demo
+![Media1 (1)](https://user-images.githubusercontent.com/98224412/236513870-b77f7c57-1744-414f-989b-f688300e4d3e.gif)
+
 # Getting Started
 These instructions will help you get a copy of the project up and running on your local machine.
 
@@ -25,19 +28,14 @@ This will launch the dashboard and allow you to interact with it.
 Once the dashboard is running, you can explore the data by selecting different countries, years, and variables using the interactive widgets.
 
 # Core R stack
-![hex-shiny](https://user-images.githubusercontent.com/98224412/236501715-82bebe12-52df-4457-8baa-6cbb465e524b.png)(https://shiny.rstudio.com/)
-[![Shiny logo](https://user-images.githubusercontent.com/98224412/236501715-82bebe12-52df-4457-8baa-6cbb465e524b.png)](https://shiny.rstudio.com/)
+
+[<img src="https://user-images.githubusercontent.com/98224412/236501715-82bebe12-52df-4457-8baa-6cbb465e524b.png" alt="Shiny logo" width="70" height="70">](https://shiny.rstudio.com/) [<img src="https://user-images.githubusercontent.com/98224412/236506918-18fe28a1-9f2b-4338-894f-f4c56b98fdb9.png" alt="Tidyverse logo" width="70" height="70">](https://www.tidyverse.org/) [<img src="https://user-images.githubusercontent.com/98224412/236506831-9f50028d-1ac6-47ae-8780-a71bd9557595.png" alt="RMarkdown logo" width="70" height="70">](https://rmarkdown.rstudio.com/) [<img src="https://user-images.githubusercontent.com/98224412/236507501-4e82f4fd-0ee3-415a-9fd8-3e3ccc4cc5c6.png" alt="dplyr logo" width="70" height="70">](https://dplyr.tidyverse.org/)
+
+[<img src="https://user-images.githubusercontent.com/98224412/236506951-b7f7241b-3e35-4ec5-829d-4edec449c8cf.png" alt="stringr logo" width="70" height="70">](https://stringr.tidyverse.org/) [<img src="https://user-images.githubusercontent.com/98224412/236506994-7b08e7c6-b92b-4453-9701-587571ec9f0b.png" alt="broom logo" width="70" height="70">](https://broom.tidymodels.org/) [<img src="https://user-images.githubusercontent.com/98224412/236507020-77520fbc-595b-48c6-8338-ed36fdf606c1.png" alt="Plotly logo" width="70" height="70">](https://plotly.com/) [<img src="https://user-images.githubusercontent.com/98224412/236507045-0fa44331-7ae3-4306-8f25-fd089224d09d.png" alt="ggplot2 logo" width="70" height="70">](https://ggplot2.tidyverse.org/)
 
 
-<!--  [<img target="_blank" src= height="50px">](https://shiny.rstudio.com/) -->
-<!--[<img target="_blank" src="https://www.tidyverse.org/images/hex-tidyverse.png" height="50px">](https://www.tidyverse.org/)
-[<img target="_blank" src="https://rmarkdown.rstudio.com/images/hex-rmarkdown.png" height="50px">](https://rmarkdown.rstudio.com/)
-[<img target="_blank" src="https://dplyr.tidyverse.org/logo.png" height="50px">](https://dplyr.tidyverse.org/)
-[<img target="_blank" src="https://stringr.tidyverse.org/articles/hex-stringr.png" height="50px">](https://stringr.tidyverse.org/)
-[<img target="_blank" src="https://broom.tidymodels.org/reference/figures/hex-broom.svg" height="50px">](https://broom.tidymodels.org/)
-[<img target="_blank" src="https://images.plot.ly/plotly-documentation/thumbnail/plotly-logo-new-branding.png" height="50px">](https://plotly.com/)
-[<img target="_blank" src="https://ggplot2.tidyverse.org/logo.png" height="50px">](https://ggplot2.tidyverse.org/)
-[<img target="_blank" src="https://www.r-graph-gallery.com/img/graph/23-heatmap-with-rcolorbrewer_files/figure-html/unnamed-chunk-4-1.png" height="50px">](https://cran.r-project.org/web/packages/RColorBrewer/index.html) -->
+
+
 
 
 # License
@@ -62,5 +60,10 @@ Data published by:
 - NASA Ozone Watch [Annual Data](http://ozonewatch.gsfc.nasa.gov/meteorology/annual_data.html)
 
 - Slaper, H. et al. Estimates of ozone depletion and skin cancer incidence to examine the Vienna Convention achievements. Nature 384(6606): 256–258 (1996). [PDF](https://www.nature.com/articles/384256a0.pdf)
+
+# Contact
+
+If you have any questions or encounter any issues running this project, please feel free to [open an issue](https://github.com/ashrafalaghbari/Data-Viz/issues) or contact me directly at [ashrafalaghbari@hotmail.com](mailto:ashrafalaghbari@hotmail.com). I'll be happy to help!
+
 
 
