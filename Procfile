@@ -1,1 +1,1 @@
-web: rmarkdown::run("ozone_dash.Rmd") --host=0.0.0.0 --post=$PORT
+web: Rscript -e "rmarkdown::run()" --host=0.0.0.0 --post=$PORT
