@@ -5,13 +5,13 @@ on:
         description: 'Manually trigger the workflow'
         default: ''
 
-#   push:
-#     branches:
-#       - main
+  push:
+    branches:
+      - main
 
 env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  IMAGE_NAME: OzoneDash
+  IMAGE_NAME: ozonedash
   REGION: asia-southeast1
   GIT_TAG: v0.1
 
