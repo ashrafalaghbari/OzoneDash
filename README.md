@@ -22,7 +22,7 @@ This will install all the necessary dependencies for the project.
 After you have installed the dependencies, to run the markdown file, use:
 
 ```r
-rmarkdown::run("ozone_dash.Rmd")
+rmarkdown::run("index.Rmd")
 ```
 This will launch the dashboard and allow you to interact with it.
 Once the dashboard is running, you can explore the data by selecting different countries, years, and variables using the interactive widgets.
